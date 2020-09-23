@@ -73,4 +73,15 @@
   end
   ```
 
-- 
+- Read file line by line 
+
+  ```ruby
+  File.readlines('resources/nginx_logs').each   do |line|
+  
+      d = line.chomp.split(/\s+/)
+  
+  end	
+  ```
+
+- API query 
+
