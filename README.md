@@ -1,6 +1,6 @@
 # sysde
 
-- fork and wait
+- fork and wait and signals
 
   ```ruby
   unless (pid = fork)
@@ -10,6 +10,34 @@
       puts "waiting for child #{pid} sleep to finish"
       Process.waitpid(pid,0)
   end
+  
+  # Ruby way 
+  
+  child_pid = fork do 
+    puts "executing in the child"
+  end  
+  
+  puts "Waiting for child to finish"
+  Process.waitpid(pid,0)
+  
+  
+  # Creating asignal handler for a child
+  
+  child_pid = fork do
+    puts "Child"
+    
+    Signal.trap("HUP") do
+      puts "HUP Signal caught"
+      exit(true)
+    end  
+  	
+    # neverending loop
+    while true do end
+  
+  end  
+  
+  Process.kill("HUP", child_pid)
+  Process.wait  
   ```
 
 - rescue 
@@ -83,6 +111,31 @@
   end	
   ```
 
+- File read in one shot 
+
+  ```ruby
+  File.read('settings.json')
+  ```
+
+- Write into a file 
+
+  ```ruby
+  open('test.txt', 'w') { |output_file|
+      output_file.print 'Write to it just like STDOUT or STDERR'
+      output_file.puts 'print(), puts(), and write() all work.'
+  }
+  ```
+
+  
+
+- JSON parse
+
+  ```ruby
+  require 'ruby'
+  
+  json_object = JSON.parse(File.read('settings.json'))
+  ```
+
 - API query 
 
   ```ruby
@@ -152,6 +205,13 @@
   	end
   end
   
+  # just a list of array can be collected
+  
+  Dir['*.png']
+  Dir['**/*']  ## Recursively go through directories and get all files
+  # Or
+  Dir.glob('*.png')
+  
   ```
 
 - Threading
@@ -182,5 +242,52 @@
   t.map { |x|  x.join }
   ```
 
-- 
+- Read files from STDIN
+
+  ```ruby
+  # ARGF will process these from STDIN
+  #cat myfile.txt | ruby myscript.rb
+  #ruby myscript.rb < myfile.txt
+  
+  # ARGF will load these files by name (as if one big input was provided to STDIN)
+  #ruby myscript.rb myfile.txt myfile2.txt
+  
+  
+  ARGF.each do |line|
+  	puts line
+  end
+  ```
+
+- Rakefile 
+
+  ```ruby
+  #!/usr/bin/ruby
+  # Rakefile
+  
+  task default: [:build, :install]  # Will run :build then :install
+  
+  task :clean do
+      puts "Cleaning"
+  end
+  
+  task :build => [:clean] do  # Will run :clean first
+      puts "Building"
+  end
+  
+  task :install do
+      puts "Installing"
+  end
+  
+  
+  # rake
+  # rake clean
+  # rake build
+  # rake install
+  ```
+
+  
+
+
+
+
 
